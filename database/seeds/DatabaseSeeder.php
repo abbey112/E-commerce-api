@@ -1,0 +1,48 @@
+<?php
+use App\User;
+use App\Buyer;
+use App\Product;
+use App\Category;
+use App\Transaction;
+use Illuminate\Database\Seeder;
+use Illuminate\support\facades\DB;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     *
+     * @return void
+     */
+    public function run()
+    {
+
+        DB::statement('SET FOREIGN_KEY_CHECKS = 0');
+
+       User::truncate();
+       Buyer::truncate();
+       Product::truncate();
+       Category::truncate();
+       Transaction::truncate();
+      
+       DB::table('category_product')->truncate();
+
+       $userQuantity = 200;
+       $productsQuantity = 30;
+       $categriesQuantity = 1000;
+       $transactionsQuantity = 1000;
+
+       factory(User::class, $userQuantity)->create();
+        factory(Category::class, $categriesQuantity)->create();
+        factory(Product::class, $productsQuantity)->create()->each(
+            function($product) {
+                $categories = Category::all()->random(mt_rand(1, 5))->pluck('id');
+
+                $product->Categories()->attach($categories);
+            }
+        );
+        factory(Transaction::class, $transactionsQuantity)->create();
+
+
+    }
+}
